@@ -4,7 +4,7 @@
 
 文档本身可以在这里找到：[https://krasjet.github.io/quaternion/](https://krasjet.github.io/quaternion/)
 
-因为还没有进行校对，所以错误可能会有很多。如果你发现有任何的错误，请到Issues中报告。
+仅仅只校对过一遍，所以错误可能会有很多。如果你发现有任何的错误或者对内容有建议，请到Issues中报告。
 
 ## Demo
 
