@@ -1,3 +1,10 @@
+% Please run this script in Octave
+1;
+
+function v = lerp(v0,v1,t)
+    v = (1-t)*v0 + t*v1;
+end
+
 v0 = [1;2];
 v1 = [1.5;6];
 v2 = [5;4];
@@ -54,8 +61,4 @@ for t=0:dt:1
     
     pause(0.01)
     i=i+1;
-end
-
-function v = lerp(v0,v1,t)
-    v = (1-t)*v0 + t*v1;
 end

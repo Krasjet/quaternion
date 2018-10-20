@@ -1,91 +1,9 @@
-% vertices for the cube
-C = transpose([
-    3   3   3   1
-    3  -3   3   1
-   -3  -3   3   1
-   -3   3   3   1
-    3   3  -3   1
-    3  -3  -3   1
-   -3  -3  -3   1
-   -3   3  -3   1   
-]);
+% Please run this script in Octave
+1;
 
-q0 = createRotQuatxyz(6, 6, 6, pi/3);
-q1 = createRotQuatxyz(0, 1, 1, pi);
-
-% a wider angle, try nlerp, robust_nlerp, slerp, and robust_slerp
-% q1 = createRotQuatxyz(0, 1, 1, 2*pi);
-
-% delta q
-q_delta = quatMult(q1,quatConj(q0));
-% axis of delta q
-axis_d = extractAxisAngleFromQuat(q_delta);
-
-
-% create an orthonormal basis for q
-q_perp = q1 - dot(q0,q1)*q0;
-q_perp = q_perp/norm(q_perp);
-% change of basis to R2
-p1 = [q0, q_perp]\q1;
-
-E=zeros(2, size(C,2)+1);
-
-dt = 0.01;
-for t=0:dt:1
-    % create an interpolation using t
-    qt = slerp(q0,q1,t);
-    % qt = robust_slerp(q0,q1,t);
-    % qt = robust_nlerp(q0,q1,t);
-    % qt = nlerp(q0,q1,t);
-    % qt = lerp(q0,q1,t);
-
-    % change of basis to R2
-    pt = [q0, q_perp]\qt;
-
-    % apply rotation
-    Q = quatToMat(qt);
-    Q(4,4) = 1;
-    C1 = Q*C;
-    % delta rotation axis
-    C1(1:3,9)=axis_d*7;C1(4,9)=1;
-    
-    % an extremely crude camera
-    C1 = [1 0 0 0 ; 0 cos(-pi/3) -sin(-pi/3) 0;0 sin(-pi/3) cos(-pi/3) 0 ; 0 0 0 1]*[cos(pi/6) -sin(pi/6) 0 0;sin(pi/6) cos(pi/6) 0 0 ; 0 0 1 0; 0 0 0 1]*C1;
-    Proj = [1 0 0 0;0 1 0 0;0 0 0 0;0 0 -1/15 1]*C1;
-    % perspective division
-    for i=1:size(Proj,2)
-        E(1:2,i) = Proj(1:2,i)/Proj(4,i);
-    end
-
-
-    % Left pane: 3D euclidean space
-    subplot(1,2,1)
-    scatter(E(1,1:8), E(2,1:8),10,'filled')
-    hold (subplot(1,2,1), 'on');
-    plot([-E(1,9),E(1,9)],[-E(2,9),E(2,9)],'b')
-    plot(E(1,1:4), E(2,1:4),'r')
-    plot([E(1,4), E(1,1)], [E(2,4), E(2,1)],'r')
-    plot(E(1,5:8), E(2,5:8),'r')
-    plot([E(1,8), E(1,5)], [E(2,8), E(2,5)],'r')
-    plot([E(1,1), E(1,5)], [E(2,1), E(2,5)],'r')
-    plot([E(1,2), E(1,6)], [E(2,2), E(2,6)],'r')
-    plot([E(1,3), E(1,7)], [E(2,3), E(2,7)],'r')
-    plot([E(1,4), E(1,8)], [E(2,4), E(2,8)],'r')
-    hold (subplot(1,2,1), 'off');
-    axis([-8 8 -8 8], 'square')
-
-    % Right pane:
-    % The 2D plane formed by q0 and q1 in 4D quaternion space
-    % q0 is fixed at (1,0)
-    subplot(1,2,2)
-    plot([0,1],[0,0], 'r')
-    hold(subplot(1,2,2), 'on');
-    plot([0,p1(1,1)], [0, p1(2,1)], 'r')
-    plot([0,pt(1,1)], [0, pt(2,1)], 'b')
-    hold(subplot(1,2,2), 'off');
-    axis([-1.2 1.2 -1.2 1.2], 'square')
-
-    pause(0.01)
+% find the angle between v0 and v1
+function t = anglev(v0,v1)
+    t = acos(dot(v0,v1)/(norm(v0)*norm(v1)));
 end
 
 % create a rotation quaternion using xyz coordinates(axis) and an angle
@@ -111,7 +29,7 @@ function q = lerp(q0,q1,t)
     q = (1-t)*q0 + t*q1;
 end
 
-% normalized lerp, angular velocity is not constant
+% normalized lerp, angular speed is not constant
 function q = nlerp(q0,q1,t)
     q = lerp(q0,q1,t);
     q = q/norm(q);
@@ -187,4 +105,95 @@ end
 % conjugate
 function q = quatConj(q1)
     q = [q1(1,1);-q1(2,1);-q1(3,1);-q1(4,1)];
+end
+
+q0 = createRotQuatxyz(6, 6, 6, pi/3);
+q1 = createRotQuatxyz(0, 1, 1, pi);
+
+% a wider angle, try nlerp, robust_nlerp, slerp, and robust_slerp
+% q1 = createRotQuatxyz(0, 1, 1, 2*pi);
+
+q0q1 = anglev(q0,q1);
+
+% find delta_q
+q_delta = quatMult(q1,quatConj(q0));
+
+axis_d = extractAxisAngleFromQuat(q_delta);
+
+% find a vector v such that Q0*v is orthogonal to axis_d
+% or you can use any vector and project it onto the plane orthogonal to
+% axis_d
+v=[0, -axis_d(3,1), axis_d(2,1)].';
+v= quatToMat(quatConj(q0))*v;
+
+% matrix for q0 and q1
+Q0 = quatToMat(q0);
+Q1 = quatToMat(q1);
+
+v0 = Q0*v;
+v1 = Q1*v;
+
+v0v1 = anglev(v0,v1);
+
+% create an orthonormal basis for q
+q_perp = q1 - dot(q0,q1)*q0;
+q_perp = q_perp/norm(q_perp);
+
+% create an orthonormal basis for v
+v_perp = v1 - (dot(v0,v1)/dot(v1,v1))*v0;
+v_perp = (v_perp / norm(v_perp))*norm(v1);
+
+% change of basis to R2
+p1 = [q0, q_perp]\q1;
+u1 = [v0, v_perp]\v1;
+
+dt = 0.01;
+for t=0:dt:1
+    % create an interpolation using t
+    qt = slerp(q0,q1,t);
+    % qt = robust_slerp(q0,q1,t);
+    % qt = robust_nlerp(q0,q1,t);
+    % qt = nlerp(q0,q1,t);
+    % qt = lerp(q0,q1,t);
+    
+    % change of basis to R2
+    pt = [q0, q_perp]\qt;
+
+    % apply transformation
+    Q = quatToMat(qt);
+    vt = Q*v;
+    ut = [v0, v_perp]\vt;
+
+    v0vt = anglev(v0,vt);
+    q0qt = anglev(q0,qt);
+    
+    % ratio of the angle between
+    % v0vt and v0v1 vs. angle q0vt and q0v1
+    qr=q0qt/q0q1
+    vr=v0vt/v0v1
+
+    % Left pane:
+    % a 2D plane formed by v0,v1 in the 3D euclidean space
+    % also the plane orthogonal to axis_d
+    % v0 is fixed at (1,0)
+    subplot(1,2,1)
+    plot([0,1],[0,0], 'r')
+    hold(subplot(1,2,1), 'on');
+    plot([0,u1(1,1)], [0, u1(2,1)], 'r')
+    plot([0,ut(1,1)], [0, ut(2,1)], 'b')
+    hold(subplot(1,2,1), 'off');
+    axis([-1.2 1.2 -1.2 1.2], 'square')
+
+    % Right pane:
+    % The 2D plane formed by q0 and q1 in 4D quaternion space
+    % q0 is fixed at (1,0)
+    subplot(1,2,2)
+    plot([0,1],[0,0], 'r')
+    hold(subplot(1,2,2), 'on');
+    plot([0,p1(1,1)], [0, p1(2,1)], 'r')
+    plot([0,pt(1,1)], [0, pt(2,1)], 'b')
+    hold(subplot(1,2,2), 'off');
+    axis([-1.2 1.2 -1.2 1.2], 'square')
+
+    pause(0.01)
 end

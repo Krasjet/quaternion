@@ -73,8 +73,7 @@ for t=0:dt:1
     plot([0,u1(1,1)], [0, u1(2,1)], 'r')
     plot([0,ut(1,1)], [0, ut(2,1)], 'b')
     hold(subplot(1,2,1), 'off');
-    axis square
-    axis([-1.2 1.2 -1.2 1.2])
+    axis([-1.2 1.2 -1.2 1.2], 'square')
 
     % Right pane:
     % The 2D plane formed by q0 and q1 in 4D quaternion space
@@ -85,8 +84,7 @@ for t=0:dt:1
     plot([0,p1(1,1)], [0, p1(2,1)], 'r')
     plot([0,pt(1,1)], [0, pt(2,1)], 'b')
     hold(subplot(1,2,2), 'off');
-    axis square
-    axis([-1.2 1.2 -1.2 1.2])
+    axis([-1.2 1.2 -1.2 1.2], 'square')
 
     pause(0.01)
 end
