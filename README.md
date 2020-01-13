@@ -20,4 +20,4 @@ Bonus章节——Gimbal Lock：[https://krasjet.github.io/quaternion/bonus_gimba
 
 If you like my works, you might also enjoy reading this:
 
-- [Poisson summation formula, revisited](https://krasjet.com/poisson.pdf)
+- [Poisson summation formula, revisited](https://krasjet.com/rnd.wlk/poisson.pdf)
