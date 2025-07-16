@@ -18,6 +18,7 @@ Bonus 章节—Gimbal Lock：[https://krasjet.github.io/quaternion/bonus_gimbal_
 - 2020/8/17：大幅度的排版修正
 - 2019/2/18：添加了第九章「附录 2：左手坐标系统下的旋转」
 - 2019/2/25：重写了第二章的开头
+- 2018/7/16：初版
 
 ## Some other stuff
 
