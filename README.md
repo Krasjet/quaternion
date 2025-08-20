@@ -26,3 +26,4 @@ If you like my works, you might also enjoy reading these:
 
 - [julia as a cli calculator](https://krasjet.com/rnd.wlk/julia/)
 - [Poisson summation formula, revisited](https://krasjet.com/rnd.wlk/poisson.pdf)
+- [projet μ](https://mu.krj.st/)
